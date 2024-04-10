@@ -85,6 +85,37 @@ async function updateUser(id, name, email) {
   return true;
 }
 
+async function checkEmail(email) {
+  const checkEmails = await usersRepository.getEmail(email);
+  if (!checkEmails) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function changePassword(id, oldPassword, newPassword, confirmPassword) {
+  if (newPassword !== confirmPassword) {
+    throw new Error("password doesn't match confirmation");
+  }
+
+  if (newPassword.length < 6 || newPassword.length > 32) {
+    throw new Error('password must be between 6 and 32 characters');
+  }
+
+  const user = await usersRepository.getUser(id);
+
+  const PasswordValid = await passwordMatched(oldPassword, user.password);
+  if (!PasswordValid) {
+    throw new Error("Old password doesn't match current password");
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  // Update the user's password
+  await usersRepository.updatePassword(id, hashedPassword);
+}
+
 /**
  * Delete user
  * @param {string} id - User ID
@@ -113,4 +144,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  checkEmail,
+  changePassword,
 };
