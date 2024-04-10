@@ -60,6 +60,13 @@ async function createUser(request, response, next) {
       );
     }
 
+    if (password !== passwordConfirm) {
+      throw errorResponder(
+        errorTypes.INVALID_PASSWORD,
+        'Password confirmation does not match'
+      );
+    }
+
     const success = await usersService.createUser(name, email, password);
     if (!success) {
       throw errorResponder(
