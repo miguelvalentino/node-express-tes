@@ -25,6 +25,12 @@ async function getUser(id) {
  * @returns {Promise}
  */
 async function createUser(name, email, password) {
+  // Check if email already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new Error('EMAIL_ALREADY_TAKEN');
+  }
+
   return User.create({
     name,
     email,
@@ -40,6 +46,12 @@ async function createUser(name, email, password) {
  * @returns {Promise}
  */
 async function updateUser(id, name, email) {
+  // Check if email already exists except for the user being updated
+  const existingUser = await User.findOne({ email, _id: { $ne: id } });
+  if (existingUser) {
+    throw new Error('EMAIL_ALREADY_TAKEN');
+  }
+
   return User.updateOne(
     {
       _id: id,
