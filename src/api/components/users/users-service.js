@@ -1,5 +1,6 @@
 const usersRepository = require('./users-repository');
 const { hashPassword } = require('../../../utils/password');
+const { passwordMatched } = require('../../../utils/password');
 
 /**
  * Get list of users
@@ -85,6 +86,7 @@ async function updateUser(id, name, email) {
   return true;
 }
 
+// check the email
 async function checkEmail(email) {
   const checkEmails = await usersRepository.getEmail(email);
   if (!checkEmails) {
@@ -105,8 +107,8 @@ async function changePassword(id, oldPassword, newPassword, confirmPassword) {
 
   const user = await usersRepository.getUser(id);
 
-  const PasswordValid = await passwordMatched(oldPassword, user.password);
-  if (!PasswordValid) {
+  const isPasswordValid = await passwordMatched(oldPassword, user.password);
+  if (!isPasswordValid) {
     throw new Error("Old password doesn't match current password");
   }
 

@@ -52,7 +52,7 @@ async function createUser(request, response, next) {
     const password = request.body.password;
     const emailExists = await usersService.checkUserEmail(email);
 
-    if (emailExists) {
+    if (!emailExists) {
       throw errorResponder(
         errorTypes.EMAIL_ALREADY_TAKEN,
         'Email already taken'
@@ -131,6 +131,28 @@ async function deleteUser(request, response, next) {
     return next(error);
   }
 }
+// Change password
+async function changePassword(request, response, next) {
+  try {
+    const id = request.params.id;
+    const oldPassword = request.body.oldPassword;
+    const newPassword = request.body.newPassword;
+    const confirmPassword = request.body.confirmPassword;
+
+    const changePass = await usersService.changePassword(
+      id,
+      oldPassword,
+      newPassword,
+      confirmPassword
+    );
+
+    return response
+      .status(200)
+      .json({ message: 'Password changed successfully' });
+  } catch (error) {
+    return next(error);
+  }
+}
 
 module.exports = {
   getUsers,
@@ -138,4 +160,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  changePassword,
 };
